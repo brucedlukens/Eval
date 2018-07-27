@@ -2,105 +2,90 @@ package main
 
 import (
     "fmt"
-    // "io/ioutil"
-    "time"
-    "strings"
+        "strings"
     "bufio"
-    // "bytes"
     "os"
-    "runtime"
     "strconv"
+	"log"
 )
 
-// PrintMemUsage outputs the current, total and OS memory being used. As well as the number 
-// of garage collection cycles completed.
-// Mostly stole from stackoverflow with small changes.
-func PrintMemUsage() {
-	   // convert bytes to megabytes
-		bToMb := func(b uint64) uint64 {
-		    return b / 1024 / 1024
+// This just does a simple pretty print
+func PrettyPrintComparisonItem(item string) {
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Printf(item + ": ")
+}
+
+// This pretty prints the matched lines
+func PrettyPrintMatchedLines(slice []int) {
+	for index, item := range slice {
+		if index > 0 {
+			fmt.Printf(", ")
 		}
-        var m runtime.MemStats
-        runtime.ReadMemStats(&m)
-        // For info on each, see: https://golang.org/pkg/runtime/#MemStats
-        fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
-        fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
-        fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
-        fmt.Printf("\tNumGC = %v\n", m.NumGC)
+		fmt.Printf(strconv.Itoa(item))
+	}
 }
 
 // This does the reading and comparing of files
-func ReadFiles() (text string, err error){
-	totalMatches := 0
-
-	// Opens the names file.
-	nameFile, nameErr := os.Open("names.txt")
-	if nameErr != nil {
-		return "", nameErr
+func ReadFiles(file1 string, file2 string) (err error){
+	// Opens the first file.
+	f1, f1Err := os.Open(file1)
+	if f1Err != nil {
+		return f1Err
 	}
-	// Close the file after the function is complete
-	defer nameFile.Close()
+	// Close f1 after the function is complete
+	defer f1.Close()
 
 	// Going to use bufio's scanner to iterate line by line
-	nameScanner := bufio.NewScanner(nameFile)
+	f1Scanner := bufio.NewScanner(f1)
 
-	for nameScanner.Scan() {
-		// Grab next name
-		name := strings.ToLower(nameScanner.Text())
+	for f1Scanner.Scan() {
+		// Grab next item from file 1
+		f1Item := strings.ToLower(f1Scanner.Text())
+		PrettyPrintComparisonItem(f1Item)
 		
-		// Opens the list file.
-		list, listErr := os.Open("list.txt")
-		if listErr != nil {
-			return "", listErr
+		// Opens the second file.
+		f2, f2Err := os.Open(file2)
+		if f2Err != nil {
+			return f2Err
 		}
 		// bufio scanner iterable
-		listScanner := bufio.NewScanner(list)
+		f2Scanner := bufio.NewScanner(f2)
 
-		// list line number reset to 1 every new name
-		listLine := 1
-		// Creating slice to store line numbers
-		var tempSlice []int
+		// file 2 line number reset to 1 every new file 1 item
+		f2Line := 1
+		// Creating slice to store line numbers, seems easier to read this way instead of random print statements
+		var slice []int
 
-		for listScanner.Scan() {
-			// Grab next item
-			item := strings.ToLower(listScanner.Text())
-
-			// Check if string is exactly equal
-			if strings.EqualFold(item, name) {
-				// fmt.Println("match: ", line, item)
-				// Add line to slice
-				tempSlice = append(tempSlice, listLine)
-				totalMatches++
+		for f2Scanner.Scan() {
+			// Check if string is exactly equal to next line item
+			if strings.EqualFold(strings.ToLower(f2Scanner.Text()), f1Item) {
+				// Add line number to slice
+				slice = append(slice, f2Line)
 			}
-			listLine++
+			f2Line++
 		}
-		fmt.Println(tempSlice)
+		// Iterate through slice to print.
+		PrettyPrintMatchedLines(slice)
 
-		// Need to close and reopen file for every new name since scanner is basically a stream
-		list.Close()
+		// Need to close and reopen file for every new file 1 item since scanner is basically a stream
+		f2.Close()
 
-		if err := listScanner.Err(); err != nil {
-			return "", err
+		if err := f2Scanner.Err(); err != nil {
+			return err
 		}
 	}
 
-	if err := nameScanner.Err(); err != nil {
-		return "", err
+	if err := f1Scanner.Err(); err != nil {
+		return err
 	}
-	return strconv.Itoa(totalMatches), nil
+	return nil
 }
 
 func main() {
-	x := time.Now()
-	PrintMemUsage()
-
-    text, err := ReadFiles()
+	fmt.Println("Starting file comparison")
+    err := ReadFiles("names.txt", "list.txt")
     if err != nil {
-    	fmt.Println(err)
+		log.Print(err)
     }
-    if text != "" {
-    	fmt.Println(text)
-    }
-	PrintMemUsage()
-	fmt.Println(time.Since(x))
 }
