@@ -1,0 +1,16 @@
+My thought process for this task was as follows (may be a bit of a stream of consciousness...):
+I used Go for a few reasons: PerformLine is switching to Go, Go seemed to benchmark really well in these sorts of tasks,
+and I have never really used Go before so it was a fun learning exercise.
+I actually built a prototype with python to test at first and it was significantly slower so I figured
+Go was the way to go.
+
+I knew that I couldn't keep the entire files in memory since they could be infinitely large so I knew I'd have to
+iterate over them. I knew that this meant that I would really only have to keep track of a few things: the current
+name, the lines that name appears on, and line count.
+Once I finished each name, I could forget all of that information and start over.
+If I could guarantee the size of the names file, I would have preferred to have kept a list of the names in memory,
+then iterated the list of words and checked each line against all of the names instead of having to iterate the
+list multiple times.
+I added a little timer to show how long the code takes to run which will print at the end of execution.
+I also added a commented out chunk of code that prints memory information that I stole from stackoverflow.
+I'm sure there are a bunch of ways to optimize this code further and I'd love to hear about them! :)

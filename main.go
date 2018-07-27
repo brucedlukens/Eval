@@ -2,17 +2,36 @@ package main
 
 import (
     "fmt"
-        "strings"
+    "strings"
     "bufio"
     "os"
     "strconv"
 	"log"
+	"time"
+	"runtime"
 )
+
+// PrintMemUsage outputs the current, total and OS memory being used. As well as the number
+// of garage collection cycles completed.
+// Mostly stolen from stackoverflow with small changes.
+func PrintMemUsage() {
+	// convert bytes to megabytes
+	bToMb := func(b uint64) uint64 {
+		return b / 1024 / 1024
+	}
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+}
 
 // This just does a simple pretty print
 func PrettyPrintComparisonItem(item string) {
-	fmt.Println("")
-	fmt.Println("")
+	fmt.Println()
+	fmt.Println()
 	fmt.Printf(item + ": ")
 }
 
@@ -43,7 +62,7 @@ func ReadFiles(file1 string, file2 string) (err error){
 		// Grab next item from file 1
 		f1Item := strings.ToLower(f1Scanner.Text())
 		PrettyPrintComparisonItem(f1Item)
-		
+
 		// Opens the second file.
 		f2, f2Err := os.Open(file2)
 		if f2Err != nil {
@@ -83,9 +102,17 @@ func ReadFiles(file1 string, file2 string) (err error){
 }
 
 func main() {
+	x := time.Now()
+	//PrintMemUsage()
 	fmt.Println("Starting file comparison")
     err := ReadFiles("names.txt", "list.txt")
     if err != nil {
 		log.Print(err)
     }
+	//fmt.Println()
+	//fmt.Println()
+	//PrintMemUsage()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Total time for comparisons: ", time.Since(x))
 }
