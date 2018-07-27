@@ -1,3 +1,6 @@
+### Status
+[![Build Status](https://travis-ci.org/brucedlukens/Eval.svg?branch=master)](https://travis-ci.org/brucedlukens/Eval.svg?branch=master)
+
 # Simple Coding Evaluation
 
 This task should take no longer than 2 hours to complete. 
