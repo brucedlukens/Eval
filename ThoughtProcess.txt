@@ -11,6 +11,11 @@ Once I finished each name, I could forget all of that information and start over
 If I could guarantee the size of the names file, I would have preferred to have kept a list of the names in memory,
 then iterated the list of words and checked each line against all of the names instead of having to iterate the
 list multiple times.
+
+Ways to improve:
+I need to implement some sort of chunking on the names file, I'm thinking of loading in a bunch of names at once, which would reduce the IO considerably. If I added in chunks of ~100 names, the amount of reads on the list file would be reduced 100 times, that would be a massive improvement. May do that on a side branch over the weekend. Need to learn more Go first.
+
+
 I added a little timer to show how long the code takes to run which will print at the end of execution.
 I also added a commented out chunk of code that prints memory information that I stole from stackoverflow.
 I'm sure there are a bunch of ways to optimize this code further and I'd love to hear about them! :)
