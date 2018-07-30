@@ -59,9 +59,15 @@ func ReadFiles(file1 string, file2 string) (err error){
 	f1Scanner := bufio.NewScanner(f1)
 
 	for f1Scanner.Scan() {
-		// Grab next item from file 1
-		f1Item := strings.ToLower(f1Scanner.Text())
-		PrettyPrintComparisonItem(f1Item)
+		// Array for storing several names, to reduce IO usage
+		file1Map := make(map[string][]int)
+		file1Map[strings.ToLower(f1Scanner.Text())] = []int{}
+
+		for len(file1Map) < 10 && f1Scanner.Scan() {
+			// Grab next item from file 1
+			file1Map[strings.ToLower(f1Scanner.Text())] = []int{}
+			//TODO: PrettyPrintComparisonItem(f1Item)
+		}
 
 		// Opens the second file.
 		f2, f2Err := os.Open(file2)
@@ -73,19 +79,26 @@ func ReadFiles(file1 string, file2 string) (err error){
 
 		// file 2 line number reset to 1 every new file 1 item
 		f2Line := 1
-		// Creating slice to store line numbers, seems easier to read this way instead of random print statements
-		var slice []int
+		// TODO: Creating slice to store line numbers, seems easier to read this way instead of random print statements
+		//var slice []int
 
 		for f2Scanner.Scan() {
-			// Check if string is exactly equal to next line item
-			if strings.EqualFold(strings.ToLower(f2Scanner.Text()), f1Item) {
-				// Add line number to slice
-				slice = append(slice, f2Line)
+			for key := range file1Map {
+				// Check if string is exactly equal to next line item
+				if strings.EqualFold(strings.ToLower(f2Scanner.Text()), key) {
+					// TODO: Add line number to slice
+					//slice = append(slice, f2Line)
+					file1Map[key] = append(file1Map[key], f2Line)
+				}
 			}
 			f2Line++
 		}
 		// Iterate through slice to print.
-		PrettyPrintMatchedLines(slice)
+		//PrettyPrintMatchedLines(slice)
+		for key, value := range file1Map {
+			PrettyPrintComparisonItem(key)
+			PrettyPrintMatchedLines(value)
+		}
 
 		// Need to close and reopen file for every new file 1 item since scanner is basically a stream
 		f2.Close()
@@ -103,15 +116,15 @@ func ReadFiles(file1 string, file2 string) (err error){
 
 func main() {
 	x := time.Now()
-	//PrintMemUsage()
+	PrintMemUsage()
 	fmt.Println("Starting file comparison")
     err := ReadFiles("names.txt", "list.txt")
     if err != nil {
 		log.Print(err)
     }
-	//fmt.Println()
-	//fmt.Println()
-	//PrintMemUsage()
+	fmt.Println()
+	fmt.Println()
+	PrintMemUsage()
 	fmt.Println()
 	fmt.Println()
 	fmt.Println("Total time for comparisons: ", time.Since(x))
