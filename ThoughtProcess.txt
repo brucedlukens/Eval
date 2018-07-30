@@ -15,6 +15,9 @@ list multiple times.
 Ways to improve:
 I need to implement some sort of chunking on the names file, I'm thinking of loading in a bunch of names at once, which would reduce the IO considerably. If I added in chunks of ~100 names, the amount of reads on the list file would be reduced 100 times, that would be a massive improvement. May do that on a side branch over the weekend. Need to learn more Go first.
 
+Follow-up!
+Added branch called "performanceImprovements" that seems to be showing a speed increase of ~15% with a 10 name chunking, if I up the chunking to 50 it gets an additional ~10% speed increase. Going up to 100% is barely an improvement over 50. Maybe worker pools would actually be useful on this.
+
 
 I added a little timer to show how long the code takes to run which will print at the end of execution.
 I also added a commented out chunk of code that prints memory information that I stole from stackoverflow.
