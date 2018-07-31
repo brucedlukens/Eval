@@ -63,7 +63,7 @@ func ReadFiles(file1 string, file2 string) (err error){
 		file1Map := make(map[string][]int)
 		file1Map[strings.ToLower(f1Scanner.Text())] = []int{}
 
-		for len(file1Map) < 10 && f1Scanner.Scan() {
+		for len(file1Map) < 30 && f1Scanner.Scan() {
 			// Grab next item from file 1
 			file1Map[strings.ToLower(f1Scanner.Text())] = []int{}
 			//TODO: PrettyPrintComparisonItem(f1Item)
@@ -85,7 +85,7 @@ func ReadFiles(file1 string, file2 string) (err error){
 		for f2Scanner.Scan() {
 			for key := range file1Map {
 				// Check if string is exactly equal to next line item
-				if strings.EqualFold(strings.ToLower(f2Scanner.Text()), key) {
+				if f2Scanner.Text() == key {
 					// TODO: Add line number to slice
 					//slice = append(slice, f2Line)
 					file1Map[key] = append(file1Map[key], f2Line)
